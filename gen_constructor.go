@@ -69,35 +69,37 @@ func getConstructor(typSpec *ast.TypeSpec) *ast.FuncDecl {
 }
 
 func genConstructorArgs(typStruct *ast.StructType) *ast.FieldList {
-	fieldLen := len(typStruct.Fields.List)
 	ret := &ast.FieldList{
-		List: make([]*ast.Field, fieldLen),
+		List: []*ast.Field{},
 	}
 
-	for i := 0; i < fieldLen; i++ {
-		field := typStruct.Fields.List[i]
+	for _, field := range typStruct.Fields.List {
+		if len(field.Names) < 1 { // embedded field
+			continue
+		}
 		fieldName := field.Names[0].Name
 
-		ret.List[i] = &ast.Field{
+		ret.List = append(ret.List, &ast.Field{
 			Names: []*ast.Ident{{Name: toArgName(fieldName)}},
 			Type:  field.Type,
-		}
+		})
 	}
 	return ret
 }
 
 func genStructVals(typStruct *ast.StructType) []ast.Expr {
-	fieldLen := len(typStruct.Fields.List)
-	ret := make([]ast.Expr, fieldLen)
+	ret := []ast.Expr{}
 
-	for i := 0; i < fieldLen; i++ {
-		field := typStruct.Fields.List[i]
+	for _, field := range typStruct.Fields.List {
+		if len(field.Names) < 1 { // embedded field
+			continue
+		}
 		fieldName := field.Names[0].Name
 
-		ret[i] = &ast.KeyValueExpr{
+		ret = append(ret, &ast.KeyValueExpr{
 			Key:   &ast.Ident{Name: fieldName},
 			Value: &ast.Ident{Name: toArgName(fieldName)},
-		}
+		})
 	}
 
 	return ret

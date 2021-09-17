@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"go/token"
 	"os"
+	"strings"
 
 	helper "github.com/vanhtuan0409/gostructhelper"
 )
@@ -18,21 +20,23 @@ func main() {
 	path := flag.String("file", "", "Source code")
 	shouldWrite := flag.Bool("write", false, "Overwrite source file")
 	stdin := flag.Bool("stdin", false, "Read from stdin")
-	disableConstructor := flag.Bool("no-constructor", false, "Skip generate constructor")
-	disableGetter := flag.Bool("no-getter", false, "Skip generate getter")
+	genConstructor := flag.Bool("constructor", false, "Generate constructor")
+	genGetter := flag.Bool("getter", false, "Generate getter")
 	flag.Parse()
 	if *name == "" {
 		usage()
 		return
 	}
+	*name = strings.TrimSpace(*name)
 
 	// Generate registry
+	fs := token.NewFileSet()
 	reg := helper.NewRegistry()
-	if !*disableConstructor {
-		reg.Register(helper.NewConstructorGenerator(*name))
+	if *genGetter {
+		reg.Register(helper.NewGetterGenerator(*name, fs))
 	}
-	if !*disableGetter {
-		reg.Register(helper.NewGetterGenerator(*name))
+	if *genConstructor {
+		reg.Register(helper.NewConstructorGenerator(*name))
 	}
 
 	// Open file
@@ -63,5 +67,5 @@ func main() {
 	}
 	defer out.Close()
 
-	helper.Gen(reg, s, out)
+	helper.Gen(reg, s, fs, out)
 }

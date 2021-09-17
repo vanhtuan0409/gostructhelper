@@ -24,8 +24,7 @@ func genInternal(reg *Registry, tree *ast.File, fs *token.FileSet, out io.WriteS
 	format.Node(out, fs, tree)
 }
 
-func Gen(reg *Registry, s *source, out io.WriteSeeker) error {
-	fs := token.NewFileSet()
+func Gen(reg *Registry, s *source, fs *token.FileSet, out io.WriteSeeker) error {
 	tree, err := parser.ParseFile(fs, s.path, s.r, parser.ParseComments)
 	if err != nil {
 		return err
