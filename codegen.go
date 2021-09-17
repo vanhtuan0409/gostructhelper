@@ -2,15 +2,15 @@ package gostructhelper
 
 import (
 	"go/ast"
+	"go/format"
 	"go/parser"
-	"go/printer"
 	"go/token"
 	"io"
 
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-func genInternal(reg *Registry, tree *ast.File, tokenSet *token.FileSet, out io.WriteSeeker) {
+func genInternal(reg *Registry, tree *ast.File, fs *token.FileSet, out io.WriteSeeker) {
 	astutil.Apply(tree, nil, func(c *astutil.Cursor) bool {
 		for _, g := range reg.generators {
 			if !reg.isDone(g) {
@@ -21,15 +21,15 @@ func genInternal(reg *Registry, tree *ast.File, tokenSet *token.FileSet, out io.
 	})
 
 	out.Seek(0, 0)
-	printer.Fprint(out, tokenSet, tree)
+	format.Node(out, fs, tree)
 }
 
 func Gen(reg *Registry, s *source, out io.WriteSeeker) error {
-	tokenSet := token.NewFileSet()
-	tree, err := parser.ParseFile(tokenSet, s.path, s.r, parser.ParseComments)
+	fs := token.NewFileSet()
+	tree, err := parser.ParseFile(fs, s.path, s.r, parser.ParseComments)
 	if err != nil {
 		return err
 	}
-	genInternal(reg, tree, tokenSet, out)
+	genInternal(reg, tree, fs, out)
 	return nil
 }

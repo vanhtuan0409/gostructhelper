@@ -79,7 +79,7 @@ func genConstructorArgs(typStruct *ast.StructType) *ast.FieldList {
 		fieldName := field.Names[0].Name
 
 		ret.List[i] = &ast.Field{
-			Names: []*ast.Ident{{Name: fieldName}},
+			Names: []*ast.Ident{{Name: toArgName(fieldName)}},
 			Type:  field.Type,
 		}
 	}
@@ -96,7 +96,7 @@ func genStructVals(typStruct *ast.StructType) []ast.Expr {
 
 		ret[i] = &ast.KeyValueExpr{
 			Key:   &ast.Ident{Name: fieldName},
-			Value: &ast.Ident{Name: fieldName},
+			Value: &ast.Ident{Name: toArgName(fieldName)},
 		}
 	}
 

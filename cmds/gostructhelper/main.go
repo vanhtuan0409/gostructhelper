@@ -2,21 +2,27 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	helper "github.com/vanhtuan0409/gostructhelper"
 )
+
+func usage() {
+	fmt.Fprintln(os.Stderr, "Usage of gostructhelper:")
+	flag.PrintDefaults()
+}
 
 func main() {
 	name := flag.String("type", "", "Struct name to generate")
 	path := flag.String("file", "", "Source code")
 	shouldWrite := flag.Bool("write", false, "Overwrite source file")
 	stdin := flag.Bool("stdin", false, "Read from stdin")
-	disableConstructor := flag.Bool("no-constructor", false, "Generate constructor")
-	disableGetter := flag.Bool("no-getter", false, "Generate getter")
+	disableConstructor := flag.Bool("no-constructor", false, "Skip generate constructor")
+	disableGetter := flag.Bool("no-getter", false, "Skip generate getter")
 	flag.Parse()
 	if *name == "" {
-		flag.Usage()
+		usage()
 		return
 	}
 
